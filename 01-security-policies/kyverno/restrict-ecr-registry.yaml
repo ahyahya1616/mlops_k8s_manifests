@@ -27,8 +27,9 @@ spec:
         pattern:
           spec:
             containers:
-              - image: "240797212774.dkr.ecr.us-east-1.amazonaws.com/*"
+              - image: "240797212774.dkr.ecr.us-east-1.amazonaws.com/* | gcr.io/ml-pipeline/* | docker.io/library/mysql:* | docker.io/minio/minio:* | quay.io/argoproj/*"
             =(initContainers):
-              - image: "240797212774.dkr.ecr.us-east-1.amazonaws.com/*"
+              - image: "240797212774.dkr.ecr.us-east-1.amazonaws.com/* | gcr.io/ml-pipeline/* | docker.io/library/mysql:* | docker.io/minio/minio:* | quay.io/argoproj/*"
             =(ephemeralContainers):
-              - image: "240797212774.dkr.ecr.us-east-1.amazonaws.com/*"
+              - image: "240797212774.dkr.ecr.us-east-1.amazonaws.com/* | gcr.io/ml-pipeline/* | docker.io/library/mysql:* | docker.io/minio/minio:* | quay.io/argoproj/*"
+

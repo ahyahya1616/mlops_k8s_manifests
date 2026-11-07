@@ -18,3 +18,4 @@ helm upgrade --install kyverno kyverno/kyverno \
 echo "==> Verifying Kyverno pods..."
 kubectl get pods -n kyverno
 echo "==> Kyverno installation successful!"
+

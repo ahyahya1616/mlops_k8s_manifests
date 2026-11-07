@@ -32,3 +32,4 @@ spec:
               - image: "!*:latest & *:?*"
             =(ephemeralContainers):
               - image: "!*:latest & *:?*"
+

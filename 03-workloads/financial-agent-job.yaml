@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: financial-data-agent-job
+  namespace: kubeflow
+  labels:
+    app: financial-data-agent
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      labels:
+        app: financial-data-agent
+    spec:
+      serviceAccountName: financial-data-sa
+      restartPolicy: Never
+      containers:
+        - name: financial-data-agent
+          image: 240797212774.dkr.ecr.us-east-1.amazonaws.com/financial-data-agent:sha-968cd0a
+          env:
+            - name: S3_BUCKET_NAME
+              value: "mlops-financial-data-240797212774-lab"
+            - name: AWS_REGION
+              value: "us-east-1"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"

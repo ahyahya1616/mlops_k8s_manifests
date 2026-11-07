@@ -33,3 +33,4 @@ mlops_k8s_manifests/
    * Baseline default-deny dropped at kernel veth interface.
    * Workloads are permitted outbound traffic only to CoreDNS, Amazon S3, Amazon ECR, and the Yahoo Finance API.
    * AWS Metadata Service (`169.254.169.254`) and internal subnets are blocked.
+

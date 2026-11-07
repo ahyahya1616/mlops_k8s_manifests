@@ -11,3 +11,4 @@ spec:
     - Egress
   # Omitting ingress and egress rules implements a pure Default-Deny posture.
   # All unsolicited inbound traffic and outbound egress are dropped at the kernel level.
+
