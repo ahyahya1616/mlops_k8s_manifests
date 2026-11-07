@@ -1,0 +1,48 @@
+# ==============================================================================
+# eBPF NetworkPolicy: Allow Kubeflow Pipelines Platform Internal Traffic
+# ==============================================================================
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-kfp-platform
+  namespace: kubeflow
+spec:
+  # Targets all core Kubeflow Pipelines platform components
+  podSelector:
+    matchLabels:
+      application-crd-id: kubeflow-pipelines
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow incoming traffic from other pods within the kubeflow namespace (e.g., UI proxy, workers)
+    - from:
+        - podSelector: {}
+  egress:
+    # Allow intra-namespace traffic between KFP components (API server, MySQL, MinIO, Envoy, etc.)
+    - to:
+        - podSelector: {}
+    # Allow DNS resolution to CoreDNS in kube-system
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Allow communication to Kubernetes API Server (controllers need to manage workflows/pods)
+    # Explicitly excludes AWS Instance Metadata Service (169.254.169.254)
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 169.254.169.254/32
+      ports:
+        - protocol: TCP
+          port: 443
+
