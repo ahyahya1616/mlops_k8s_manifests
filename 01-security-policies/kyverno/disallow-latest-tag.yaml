@@ -1,0 +1,34 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-latest-tag
+  annotations:
+    policies.kyverno.io/title: Disallow Latest Tag
+    policies.kyverno.io/category: DevSecOps Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/description: >-
+      The ':latest' tag is mutable and can lead to non-deterministic rollouts.
+      This policy enforces that all container images in the 'kubeflow' namespace
+      declare an explicit, immutable Git SHA or semantic version tag.
+spec:
+  validationFailureAction: Enforce
+  background: false
+  rules:
+    - name: validate-image-tag
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - kubeflow
+      validate:
+        message: "Zero-Trust Supply-Chain Violation: The ':latest' tag or untagged images are strictly prohibited in the 'kubeflow' namespace. Please deploy using an immutable Git SHA tag."
+        pattern:
+          spec:
+            containers:
+              - image: "!*:latest & *:?*"
+            =(initContainers):
+              - image: "!*:latest & *:?*"
+            =(ephemeralContainers):
+              - image: "!*:latest & *:?*"

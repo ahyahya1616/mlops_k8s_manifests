@@ -1,0 +1,34 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: restrict-ecr-registry
+  annotations:
+    policies.kyverno.io/title: Restrict Container Image Registry
+    policies.kyverno.io/category: Supply Chain Security
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Restricts container images in the 'kubeflow' namespace to be pulled exclusively
+      from the approved private Amazon ECR repository. Public registries like
+      Docker Hub (docker.io), Quay, and GHCR are blocked at admission.
+spec:
+  validationFailureAction: Enforce
+  background: false
+  rules:
+    - name: validate-ecr-registry
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - kubeflow
+      validate:
+        message: "Zero-Trust Supply-Chain Violation: Images from public registries (such as Docker Hub) are prohibited in namespace 'kubeflow'. Images must originate from our private Amazon ECR registry: 240797212774.dkr.ecr.us-east-1.amazonaws.com"
+        pattern:
+          spec:
+            containers:
+              - image: "240797212774.dkr.ecr.us-east-1.amazonaws.com/*"
+            =(initContainers):
+              - image: "240797212774.dkr.ecr.us-east-1.amazonaws.com/*"
+            =(ephemeralContainers):
+              - image: "240797212774.dkr.ecr.us-east-1.amazonaws.com/*"

@@ -1,0 +1,13 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: kubeflow
+spec:
+  # Empty podSelector selects all pods in the kubeflow namespace
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+  # Omitting ingress and egress rules implements a pure Default-Deny posture.
+  # All unsolicited inbound traffic and outbound egress are dropped at the kernel level.

@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-pipeline-egress
+  namespace: kubeflow
+spec:
+  # Targets the Financial Data Agent workload pods
+  podSelector:
+    matchLabels:
+      app: financial-data-agent
+  policyTypes:
+    - Egress
+  egress:
+    # Rule 1: DNS Resolution to CoreDNS in kube-system
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+    # Rule 2: Egress to AWS S3, ECR & Yahoo Finance API (HTTPS Port 443)
+    # Explicitly excludes AWS Instance Metadata (169.254.169.254) and internal VPC subnets (10.0.0.0/16)
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 169.254.169.254/32 # Block AWS Instance Metadata Service (SSRF defense)
+              - 10.0.0.0/16         # Block internal VPC nodes and private IPs
+              - 172.20.0.0/16       # Block internal Kubernetes Service CIDR
+      ports:
+        - protocol: TCP
+          port: 443
